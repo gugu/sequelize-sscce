@@ -15,6 +15,11 @@ export async function run() {
   const sequelize = createSequelize6Instance({
     logQueryParameters: true,
     benchmark: true,
+    dialectOptions: {
+        supportBigNumbers: true,
+        multipleStatements: false,
+    },
+
     define: {
       // For less clutter in the SSCCE
       timestamps: false,
@@ -24,7 +29,11 @@ export async function run() {
   class Foo extends Model {}
 
   Foo.init({
-    name: DataTypes.TEXT,
+    id: {
+	    type: DataTypes.BIGINT,
+	    autoIncrement: true,
+	    primaryKey: true,
+    }
   }, {
     sequelize,
     modelName: 'Foo',
@@ -36,6 +45,6 @@ export async function run() {
   await sequelize.sync({ force: true });
   expect(spy).to.have.been.called;
 
-  console.log(await Foo.create({ name: 'TS foo' }));
+  console.log(await Foo.bulkCreate([{ id: 3415718944570971483n }, {id: 6190095476713727669n }]))
   expect(await Foo.count()).to.equal(1);
 }
